@@ -8,12 +8,12 @@ flowchart TD
     %% --- Entry Layer ---
     A[Game Provider (Pragmatic, etc)] -->|API / gRPC| B[Wallet Service (Multi Node)]
     subgraph "Wallet Service"
-        B1[1️⃣ Receive Transaction Request]
-        B2[2️⃣ Idempotency Check\nRedis SETNX idemp:<tx_id>]
-        B3[3️⃣ Insert trx_log\nINSERT ... ON CONFLICT DO NOTHING]
-        B4[4️⃣ Update Balance Atomic\nUPDATE wallet SET balance=balance+amt\nWHERE balance+amt>=0 RETURNING balance]
-        B5[5️⃣ Invalidate Cache / Update Cache\nRedis: DEL wallet:balance:<player_id>]
-        B6[6️⃣ Return Result\n(success / duplicate / insufficient)]
+        B1[1. Receive Transaction Request]
+        B2[2. Idempotency Check (Redis SETNX idemp:<tx_id>)]
+        B3[3. Insert trx_log (INSERT ... ON CONFLICT DO NOTHING)]
+        B4[4. Update Balance Atomic (UPDATE wallet SET balance=balance+amt WHERE balance+amt>=0 RETURNING balance)]
+        B5[5. Invalidate/Update Cache (Redis: DEL wallet:balance:<player_id>)]
+        B6[6. Return Result (success / duplicate / insufficient)]
     end
 
     B --> B1 --> B2 --> B3 --> B4 --> B5 --> B6
@@ -22,8 +22,8 @@ flowchart TD
     %% --- Data Layer ---
     subgraph "Database Layer"
         D1[(PostgreSQL)]
-        D1a[wallet table\nplayer_id PK, balance, version]
-        D1b[trx_log table\nunique tx_id, player_id, amount, provider]
+        D1a[wallet table (player_id PK, balance, version)]
+        D1b[trx_log table (unique tx_id, player_id, amount, provider)]
     end
 
     subgraph "Cache Layer"
@@ -39,7 +39,7 @@ flowchart TD
 
     %% --- Background Process ---
     subgraph "Background Jobs"
-        J1[Periodic Reconciliation\n(DB vs Cache)]
+        J1[Periodic Reconciliation (DB vs Cache)]
         J2[Reapply Failed Transactions]
         J3[Cleanup Expired Idempotency Keys]
     end
@@ -64,3 +64,4 @@ flowchart TD
     style R1 fill:#ffd54f,stroke:#ff9800,stroke-width:2px
     style J1 fill:#b39ddb,stroke:#7e57c2,stroke-width:2px
     style M1 fill:#f8bbd0,stroke:#e91e63,stroke-width:2px
+```
