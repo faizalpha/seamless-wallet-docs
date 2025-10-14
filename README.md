@@ -1,3 +1,8 @@
+# Seamless Wallet Service Flow
+
+Diagram berikut menjelaskan arsitektur dan alur transaksi pada layanan wallet seamless.
+
+```mermaid
 flowchart TD
 
     %% --- Entry Layer ---
