@@ -6,14 +6,15 @@ Diagram berikut menjelaskan arsitektur dan alur transaksi pada layanan wallet se
 flowchart TD
 
 %% --- Entry Layer ---
-A[Game Provider (Pragmatic, etc)] -->|gRPC API| B[Wallet Service (Multi Node)]
+A[Game Provider - Pragmatic etc] -->|gRPC API| B[Wallet Service Multi Node]
+
 subgraph WalletService
     B1[1. Receive Transaction Request]
-    B2[2. Idempotency Check (Redis SETNX idemp:&lt;tx_id&gt;)]
-    B3[3. Insert trx_log (INSERT ... ON CONFLICT DO NOTHING)]
-    B4[4. Update Balance Atomic (UPDATE wallet SET balance=balance+amt WHERE balance+amt&gt;=0 RETURNING balance)]
-    B5[5. Invalidate or Update Cache (Redis: DEL wallet:balance:&lt;player_id&gt;)]
-    B6[6. Return Result (success / duplicate / insufficient)]
+    B2[2. Idempotency Check - Redis SETNX idemp:&lt;tx_id&gt;]
+    B3[3. Insert trx_log - INSERT ON CONFLICT DO NOTHING]
+    B4[4. Update Balance Atomic - UPDATE wallet SET balance=balance+amt WHERE balance+amt&gt;=0 RETURNING balance]
+    B5[5. Invalidate or Update Cache - Redis DEL wallet:balance:&lt;player_id&gt;]
+    B6[6. Return Result - success duplicate insufficient]
 end
 
 A --> B1 --> B2 --> B3 --> B4 --> B5 --> B6
@@ -22,8 +23,8 @@ B6 -->|Response| A
 %% --- Data Layer ---
 subgraph DatabaseLayer
     D1[(PostgreSQL)]
-    D1a[wallet table (player_id PK, balance, version)]
-    D1b[trx_log table (unique tx_id, player_id, amount, provider)]
+    D1a[wallet table - player_id PK, balance, version]
+    D1b[trx_log table - unique tx_id, player_id, amount, provider]
 end
 
 subgraph CacheLayer
@@ -39,7 +40,7 @@ B2 --> R1a
 
 %% --- Background Process ---
 subgraph BackgroundJobs
-    J1[Periodic Reconciliation (DB vs Cache)]
+    J1[Periodic Reconciliation DB vs Cache]
     J2[Reapply Failed Transactions]
     J3[Cleanup Expired Idempotency Keys]
 end
