@@ -9,10 +9,10 @@ flowchart TD
 A[Game Provider (Pragmatic, etc)] -->|API / gRPC| B[Wallet Service (Multi Node)]
 subgraph "Wallet Service"
     B1[1. Receive Transaction Request]
-    B2[2. Idempotency Check (Redis SETNX idemp:<tx_id>)]
+    B2[2. Idempotency Check (Redis SETNX idemp:&lt;tx_id&gt;)]
     B3[3. Insert trx_log (INSERT ... ON CONFLICT DO NOTHING)]
-    B4[4. Update Balance Atomic (UPDATE wallet SET balance=balance+amt WHERE balance+amt>=0 RETURNING balance)]
-    B5[5. Invalidate/Update Cache (Redis: DEL wallet:balance:<player_id>)]
+    B4[4. Update Balance Atomic (UPDATE wallet SET balance=balance+amt WHERE balance+amt&gt;=0 RETURNING balance)]
+    B5[5. Invalidate/Update Cache (Redis: DEL wallet:balance:&lt;player_id&gt;)]
     B6[6. Return Result (success / duplicate / insufficient)]
 end
 
@@ -28,8 +28,8 @@ end
 
 subgraph "Cache Layer"
     R1[(Redis)]
-    R1a[idemp:<tx_id> key]
-    R1b[wallet:balance:<player_id> cache]
+    R1a[idemp:&lt;tx_id&gt; key]
+    R1b[wallet:balance:&lt;player_id&gt; cache]
 end
 
 B3 -->|INSERT / ON CONFLICT| D1b
@@ -64,4 +64,3 @@ style D1 fill:#d4e157,stroke:#8bc34a,stroke-width:2px
 style R1 fill:#ffd54f,stroke:#ff9800,stroke-width:2px
 style J1 fill:#b39ddb,stroke:#7e57c2,stroke-width:2px
 style M1 fill:#f8bbd0,stroke:#e91e63,stroke-width:2px
-```
